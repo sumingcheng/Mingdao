@@ -24,33 +24,33 @@ rl.question('是否进行批量上传（y/n）：', async (answer) => {
   rl.close()
 })
 
-async function uploadTheFiles () {
+async function uploadTheFiles() {
   // 获取文件夹内的文件名和对应的 Base64 值
-  const folderPath = path.resolve(__dirname, '../../upload')
+  const folderPath = path.resolve(__dirname, '../../4')
   const filesData = getFilesData(folderPath)
-
+  
   // 根据总数上传文件
   const total = filesData.length
-
-  for (let i = 0; i < total; i++) {
+  
+  for (let i = 0; i < total; i ++) {
     const fileData = filesData[i]
     // 逐个上传文件
     try {
       await bulkUploads([fileData])
-      console.log(colors('bright', `文件上传成功: ${fileData[0].value}`))
+      console.log(colors('bright', `文件上传成功: ${fileData[0].value} —— 已上传 ${i + 1} 个文件,共 ${total} 个文件`))
     } catch (error) {
       console.error('文件上传失败:', error)
     }
   }
-
+  
   console.log(colors('bright', `上传完成，共上传 ${total} 个文件`))
 }
 
-async function bulkUploads (filesData) {
+async function bulkUploads(filesData) {
   return await bulkRowRecords(filesData)
 }
 
-function getFilesData (folderPath) {
+function getFilesData(folderPath) {
   try {
     const fileNames = fs.readdirSync(folderPath)
     return fileNames.map((fileName) => {
