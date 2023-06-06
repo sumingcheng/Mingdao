@@ -12,12 +12,11 @@ const rl = readline.createInterface({
 })
 
 // 提示用户输入命令
-rl.question('是否进行批量上传（y/n）：', (answer) => {
+rl.question('是否进行批量上传（y/n）：', async (answer) => {
   // 根据用户输入的命令进行下一步操作
   if (answer === 'y') {
     console.log(colors('green', '开始批量上传'))
-    uploadTheFile()
-    // 在这里写下一步操作的代码
+    await uploadTheFiles()
   } else {
     console.log(colors('red', '已取消批量上传'))
   }
@@ -25,61 +24,43 @@ rl.question('是否进行批量上传（y/n）：', (answer) => {
   rl.close()
 })
 
-async function uploadTheFile () {
-  // 获取文件夹内 filename 与 base64 和 total
+async function uploadTheFiles () {
+  // 获取文件夹内的文件名和对应的 Base64 值
   const folderPath = path.resolve(__dirname, '../../upload')
-  let total = getFileCount(folderPath)
-  // 根据总数上传文件
-  for (let i = 0; i < total; i++) {
-    let uploadFiles = []
-    let {fileName, base64} = getNameBase64(folderPath, i)
-    // 构造上传数据
-    let file = new FilesData(fileName, base64)
-    uploadFiles.push(file.filesData)
-    print(uploadFiles)
+  const filesData = getFilesData(folderPath)
 
-    let res = await bulkUploads(uploadFiles)
+  // 根据总数上传文件
+  const total = filesData.length
+
+  for (let i = 0; i < total; i++) {
+    const fileData = filesData[i]
+    // 逐个上传文件
+    try {
+      await bulkUploads([fileData])
+      console.log(colors('green', `文件上传成功: ${fileData[0].value}`))
+    } catch (error) {
+      console.error('文件上传失败:', error)
+    }
   }
+
   console.log(colors('green', `上传完成，共上传 ${total} 个文件`))
 }
-
 
 async function bulkUploads (filesData) {
   return await bulkRowRecords(filesData)
 }
 
-function getNameBase64 (filePath, index) {
+function getFilesData (folderPath) {
   try {
-    // 读取文件夹中的所有文件名
-    const fileNames = fs.readdirSync(filePath)
-    if (index >= 0 && fileNames.length) {
-      const fileName = fileNames[index]
-      const fileContent = fs.readFileSync(`${filePath}/${fileName}`)
-      // 将文件内容转换为 Base64 编码
+    const fileNames = fs.readdirSync(folderPath)
+    return fileNames.map((fileName) => {
+      const filePath = path.join(folderPath, fileName)
+      const fileContent = fs.readFileSync(filePath)
       const base64 = fileContent.toString('base64')
-
-      return {
-        fileName,
-        base64,
-      }
-    } else {
-      new Error('索引超出范围')
-    }
+      return new FilesData(fileName, base64).filesData
+    })
   } catch (error) {
     console.error('无法读取文件:', error)
-    return null
+    return []
   }
 }
-
-function getFileCount (folderPath) {
-  try {
-    const files = fs.readdirSync(folderPath)
-    return files.length
-  } catch (error) {
-    console.error('Failed to read folder:', error)
-    return 0
-  }
-}
-
-
-
