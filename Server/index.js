@@ -1,8 +1,9 @@
 const {bulkRowRecords} = require('../api/xiaoShuo')
-const {filesData, FilesData} = require('./filesData')
+const {FilesData} = require('./filesData')
 const fs = require('fs')
 const path = require('path')
 const {print} = require('../utils')
+const colors = require('colors-console')
 
 init()
 
@@ -13,21 +14,23 @@ function init () {
 async function uploadTheFile () {
   // 获取文件夹内 filename 与 base64 和 total
   const folderPath = path.resolve(__dirname, '../../upload')
-  let uploadFiles = []
   let total = getFileCount(folderPath)
   // 根据总数上传文件
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < total; i++) {
+    let uploadFiles = []
     let {fileName, base64} = getNameBase64(folderPath, i)
     // 构造上传数据
     let file = new FilesData(fileName, base64)
     uploadFiles.push(file.filesData)
+    print(uploadFiles)
+    await (bulkUploads(uploadFiles))
   }
-  print(uploadFiles)
-  // bulkUploads(uploadFiles)
+  console.log(colors('green', `上传完成，共上传 ${total} 个文件`))
 }
 
+
 async function bulkUploads (filesData) {
-  await bulkRowRecords(filesData)
+  return await bulkRowRecords(filesData)
 }
 
 function getNameBase64 (filePath, index) {
