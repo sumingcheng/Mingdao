@@ -17,36 +17,38 @@ async function uploadTheFile () {
   let total = getFileCount(folderPath)
   // 根据总数上传文件
   for (let i = 0; i < 1; i++) {
-    let {fileName, Base64} = getNameBase64(folderPath, i)
+    let {fileName, base64} = getNameBase64(folderPath, i)
     // 构造上传数据
-    let file = new FilesData(fileName, Base64)
+    let file = new FilesData(fileName, base64)
     uploadFiles.push(file.filesData)
   }
   print(uploadFiles)
+  // bulkUploads(uploadFiles)
+}
 
+async function bulkUploads (filesData) {
+  await bulkRowRecords(filesData)
 }
 
 function getNameBase64 (filePath, index) {
   try {
     // 读取文件夹中的所有文件名
     const fileNames = fs.readdirSync(filePath)
-
-    if (index >= 0 && index < fileNames.length) {
+    if (index >= 0 && fileNames.length) {
       const fileName = fileNames[index]
       const fileContent = fs.readFileSync(`${filePath}/${fileName}`)
-
       // 将文件内容转换为 Base64 编码
-      const base64Content = fileContent.toString('base64')
+      const base64 = fileContent.toString('base64')
 
       return {
         fileName,
-        base64Content,
+        base64,
       }
     } else {
-      throw new Error('Index out of range')
+      throw new Error('索引超出范围')
     }
   } catch (error) {
-    console.error('Failed to read file:', error)
+    console.error('无法读取文件:', error)
     return null
   }
 }
@@ -62,7 +64,4 @@ function getFileCount (folderPath) {
 }
 
 
-async function bulkUploads () {
-  await bulkRowRecords(filesData)
-}
 
