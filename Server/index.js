@@ -37,13 +37,13 @@ async function uploadTheFiles () {
     // 逐个上传文件
     try {
       await bulkUploads([fileData])
-      console.log(colors('green', `文件上传成功: ${fileData[0].value}`))
+      console.log(colors('bright', `文件上传成功: ${fileData[0].value}`))
     } catch (error) {
       console.error('文件上传失败:', error)
     }
   }
 
-  console.log(colors('green', `上传完成，共上传 ${total} 个文件`))
+  console.log(colors('bright', `上传完成，共上传 ${total} 个文件`))
 }
 
 async function bulkUploads (filesData) {
