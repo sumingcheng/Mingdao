@@ -4,12 +4,26 @@ const fs = require('fs')
 const path = require('path')
 const {print} = require('../utils')
 const colors = require('colors-console')
+const readline = require('readline')
 
-init()
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
 
-function init () {
-  uploadTheFile()
-}
+// 提示用户输入命令
+rl.question('是否进行批量上传（y/n）：', (answer) => {
+  // 根据用户输入的命令进行下一步操作
+  if (answer === 'y') {
+    console.log(colors('green', '开始批量上传'))
+    uploadTheFile()
+    // 在这里写下一步操作的代码
+  } else {
+    console.log(colors('red', '已取消批量上传'))
+  }
+  // 关闭输入流
+  rl.close()
+})
 
 async function uploadTheFile () {
   // 获取文件夹内 filename 与 base64 和 total
@@ -23,7 +37,8 @@ async function uploadTheFile () {
     let file = new FilesData(fileName, base64)
     uploadFiles.push(file.filesData)
     print(uploadFiles)
-    await (bulkUploads(uploadFiles))
+
+    let res = await bulkUploads(uploadFiles)
   }
   console.log(colors('green', `上传完成，共上传 ${total} 个文件`))
 }
@@ -48,7 +63,7 @@ function getNameBase64 (filePath, index) {
         base64,
       }
     } else {
-      throw new Error('索引超出范围')
+      new Error('索引超出范围')
     }
   } catch (error) {
     console.error('无法读取文件:', error)

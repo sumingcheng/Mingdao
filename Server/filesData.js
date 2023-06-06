@@ -1,5 +1,3 @@
-const {getFileBase64} = require('./Base64')
-
 class FilesData {
   constructor (fileName, base64) {
     this.filesData = [
