@@ -1,6 +1,5 @@
 const {AppKey, Sign, WorksheetId} = require('../config')
 const http = require('./http')
-const {getFileBase64} = require('../Server/Base64')
 
 // 获取列表 POST
 function getTheList (val) {
@@ -38,24 +37,8 @@ function bulkRowRecords (data) {
       sign: Sign,
       worksheetId: WorksheetId,
       triggerWorkflow: false,
-      rows: [[
-        {
-          'controlId': '647321200279bf9fdb479429',
-          'value': '文本'
-        },
-        {
-          'value': '测试上传',
-          'controlId': '647321200279bf9fdb47942b',
-          'editType': 1,
-          'valueType': 2,
-          'controlFiles': [{
-            baseFile: getFileBase64(),
-            fileName: 'git.png'
-          }]
-        }
-      ]
-      ],
-    },
+      rows: data
+    }
   })
 }
 
