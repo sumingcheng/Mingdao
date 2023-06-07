@@ -4,7 +4,9 @@
   "description": "mingdao",
   "main": "Server/index.js",
   "scripts": {
-    "dev": "nodemon Server/index.js"
+    "dev": "nodemon Server/index.js",
+    "delete": "node Server/bulkDeletion.js",
+    "upload": "node Server/bulkUploads.js"
   },
   "keywords": [],
   "author": "",
